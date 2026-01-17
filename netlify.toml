@@ -1,33 +1,19 @@
 [build]
   # Use Bun for installation and build
-  # Netlify will automatically detect bun.lock and use bun install
   command = "bun run build"
-  # TanStack Start with Netlify plugin outputs to .netlify/dist
-  publish = ".netlify/dist"
+  # Vite outputs to dist directory
+  publish = "dist"
 
 [build.environment]
   # Set Bun version for consistency
-  # Using 1.1.x for better stability on Netlify (1.2.x has known issues)
-  # You can update to match your local version if needed
   BUN_VERSION = "1.1.30"
-  # Node version for compatibility (Netlify build image includes Node)
+  # Node version for compatibility
   NODE_VERSION = "20"
 
-# Netlify Functions configuration
-# TanStack Start SSR functions are handled by the Netlify plugin
-[functions]
-  directory = ".netlify/functions"
-  node_bundler = "esbuild"
-
-# Redirects for TanStack Start SSR
-# The Netlify plugin handles most routing, but we ensure proper fallbacks
-# Static assets and API routes are handled automatically by the plugin
-
-# Catch-all for SSR - let TanStack Start handle routing
-# The plugin creates the server function automatically
+# SPA fallback - serve index.html for all routes
 [[redirects]]
   from = "/*"
-  to = "/.netlify/functions/server"
+  to = "/index.html"
   status = 200
 
 # Headers for security and performance
