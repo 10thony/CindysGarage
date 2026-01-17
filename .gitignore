@@ -40,3 +40,6 @@ lerna-debug.log*
 
 # Generated files
 src/routeTree.gen.ts
+
+# Local Netlify folder
+.netlify

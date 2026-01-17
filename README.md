@@ -158,6 +158,42 @@ garage-sale-manager/
 └── README.md         # This file
 ```
 
+## 🚀 Deployment
+
+### Netlify Deployment
+
+This project is configured for deployment on Netlify with Bun support.
+
+#### Prerequisites
+
+1. **Netlify Account**: Sign up at [netlify.com](https://www.netlify.com/)
+2. **Environment Variables**: Set the following in Netlify's environment variables:
+   - `CONVEX_DEPLOYMENT` - Your Convex deployment URL
+   - `VITE_CONVEX_URL` - Your Convex URL (if needed)
+   - Clerk, Stripe, and UploadThing API keys as required by your app
+
+#### Deployment Steps
+
+1. **Connect Repository**: Link your Git repository to Netlify
+2. **Build Settings**: Netlify will automatically detect:
+   - `bun.lock` file → uses `bun install` for dependencies
+   - `netlify.toml` → uses configured build command: `bun run build`
+3. **Environment Variables**: Add all required environment variables in Netlify dashboard
+4. **Deploy**: Push to your main branch or trigger a manual deploy
+
+#### Build Configuration
+
+The project uses:
+- **Build Command**: `bun run build` (configured in `netlify.toml`)
+- **Publish Directory**: `.netlify/dist` (handled by TanStack Start Netlify plugin)
+- **Bun Version**: Set via `BUN_VERSION` environment variable (defaults to 1.1.30 for stability)
+
+#### Notes
+
+- Netlify automatically detects `bun.lock` and uses Bun for dependency installation
+- The `@netlify/vite-plugin-tanstack-start` plugin handles SSR function generation
+- Ensure your Convex deployment is configured and accessible from Netlify
+
 ## 🤝 Contributing
 
 This is a private project. Please follow the established patterns and ensure all security checks pass before submitting changes.
