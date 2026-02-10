@@ -32,6 +32,40 @@
     --radius: 0.75rem;
   }
 
+  /* Home page theme: ink black, prussian blue, regal navy, school bus yellow, gold */
+  [data-theme="garage"] {
+    --ink-black: #000814;
+    --prussian-blue: #001d3d;
+    --regal-navy: #003566;
+    --school-bus-yellow: #ffc300;
+    --gold: #ffd60a;
+    /* Semantic mapping (HSL for Tailwind hsl(var(...))) */
+    --background: 217 100% 4%;
+    --foreground: 47 25% 97%;
+    --card: 210 100% 12%;
+    --card-foreground: 47 25% 97%;
+    --popover: 210 100% 12%;
+    --popover-foreground: 47 25% 97%;
+    --primary: 45 100% 50%;
+    --primary-foreground: 217 100% 4%;
+    --secondary: 208 100% 20%;
+    --secondary-foreground: 47 25% 97%;
+    --muted: 208 100% 20%;
+    --muted-foreground: 217 30% 72%;
+    --accent: 47 100% 52%;
+    --accent-foreground: 217 100% 4%;
+    --destructive: 0 72% 50%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 210 100% 18%;
+    --input: 208 100% 15%;
+    --ring: 45 100% 50%;
+    --chart-1: 45 100% 50%;
+    --chart-2: 47 100% 52%;
+    --chart-3: 208 100% 20%;
+    --chart-4: 210 100% 12%;
+    --chart-5: 217 100% 4%;
+  }
+
   .dark {
     --background: 0 0% 8%;
     --foreground: 0 0% 98%;
@@ -78,6 +112,21 @@
   h1, h2, h3, h4, h5, h6 {
     @apply font-semibold tracking-tight;
   }
+  
+  [data-theme="garage"] {
+    font-family: 'DM Sans', system-ui, sans-serif;
+  }
+  
+  [data-theme="garage"] h1,
+  [data-theme="garage"] h2,
+  [data-theme="garage"] h3,
+  [data-theme="garage"] h4,
+  [data-theme="garage"] h5,
+  [data-theme="garage"] h6 {
+    font-family: 'Syne', 'DM Sans', system-ui, sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
 }
 
 @layer utilities {
@@ -121,6 +170,16 @@
     background: linear-gradient(135deg, hsl(var(--card)) 0%, hsl(0 0% 99.5%) 100%);
   }
   
+  /* Garage theme: deep blue gradient with subtle gold glow */
+  [data-theme="garage"] .gradient-bg {
+    background: linear-gradient(160deg, #000814 0%, #001d3d 45%, #003566 100%);
+  }
+  
+  [data-theme="garage"] .card-gradient {
+    background: linear-gradient(165deg, #001831 0%, #001d3d 50%, #00203d 100%);
+    box-shadow: 0 4px 24px -4px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 198, 0, 0.08);
+  }
+  
   /* Smooth shadow utilities */
   .shadow-elegant {
     box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.08), 0 4px 16px -4px rgba(0, 0, 0, 0.06);
@@ -132,5 +191,17 @@
   
   .shadow-elegant-xl {
     box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.12), 0 16px 48px -12px rgba(0, 0, 0, 0.1);
+  }
+  
+  [data-theme="garage"] .shadow-elegant {
+    box-shadow: 0 2px 12px -2px rgba(0, 0, 0, 0.35), 0 4px 20px -4px rgba(0, 53, 102, 0.25);
+  }
+  
+  [data-theme="garage"] .shadow-elegant-lg {
+    box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 214, 10, 0.06);
+  }
+  
+  [data-theme="garage"] .shadow-elegant-xl {
+    box-shadow: 0 12px 32px -6px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 198, 0, 0.08);
   }
 }

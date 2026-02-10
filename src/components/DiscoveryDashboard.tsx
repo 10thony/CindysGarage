@@ -63,7 +63,7 @@ export function DiscoveryDashboard() {
   }
 
   return (
-    <div className="min-h-screen gradient-bg">
+    <div className="min-h-screen gradient-bg" data-theme="garage">
       {/* Elegant Header */}
       <header className="sticky top-0 z-10 backdrop-blur-md bg-background/80 border-b border-border/50 shadow-elegant">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -91,7 +91,6 @@ export function DiscoveryDashboard() {
             </div>
             <Button
               onClick={handleAuthClick}
-              variant="outline"
               className="flex items-center gap-2"
             >
               {isSignedIn ? (

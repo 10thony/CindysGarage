@@ -1,11 +1,11 @@
-import { action, httpAction } from "./_generated/server";
+import { action } from "./_generated/server";
 import { v } from "convex/values";
 import { api } from "./_generated/api";
 import Stripe from "stripe";
 
-// Initialize Stripe with secret key from environment
+// Initialize Stripe with secret key from environment (set in Convex dashboard)
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
-  apiVersion: "2023-10-16",
+  apiVersion: "2026-01-28.clover",
 });
 
 /**
@@ -99,152 +99,4 @@ export const createCheckoutSession = action({
       orderId: orderId,
     };
   },
-});
-
-/**
- * HTTP Action to handle Stripe webhooks
- * This endpoint should be configured in Stripe dashboard
- */
-export const handleStripeWebhook = httpAction(async (ctx, request) => {
-  const signature = request.headers.get("stripe-signature");
-  
-  if (!signature) {
-    return new Response("Missing stripe-signature header", { status: 400 });
-  }
-  
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-  
-  if (!webhookSecret) {
-    return new Response("Missing STRIPE_WEBHOOK_SECRET", { status: 500 });
-  }
-  
-  const body = await request.text();
-  
-  let event: Stripe.Event;
-  
-  try {
-    event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
-  } catch (err) {
-    const error = err as Error;
-    console.error("Webhook signature verification failed:", error.message);
-    return new Response(`Webhook Error: ${error.message}`, { status: 400 });
-  }
-  
-  // Handle the event
-  switch (event.type) {
-    case "checkout.session.completed": {
-      const session = event.data.object as Stripe.Checkout.Session;
-      
-      // Find order by session ID (we'll need to query orders)
-      // For now, we'll use the metadata
-      const orderId = session.metadata?.orderId;
-      
-      if (!orderId) {
-        console.error("No orderId in session metadata");
-        return new Response("Missing orderId in metadata", { status: 400 });
-      }
-      
-      // Get order from database
-      const order = await ctx.runQuery(api.orders.getOrder, {
-        orderId: orderId as any, // Type assertion needed - orderId from metadata is string
-      });
-      
-      if (!order) {
-        console.error(`Order ${orderId} not found`);
-        return new Response(`Order ${orderId} not found`, { status: 404 });
-      }
-      
-      // Update order status to completed
-      await ctx.runMutation(api.orders.updateOrderStatus, {
-        orderId: orderId as any,
-        status: "completed",
-      });
-      
-      // Mark all items as sold
-      for (const itemId of order.itemIds) {
-        try {
-          await ctx.runMutation(api.items.markItemAsSold, {
-            itemId: itemId,
-          });
-        } catch (error) {
-          console.error(`Failed to mark item ${itemId} as sold:`, error);
-          // Continue with other items even if one fails
-        }
-      }
-      
-      break;
-    }
-    
-    case "checkout.session.async_payment_failed": {
-      // Handle failed payment - release items back to available
-      const session = event.data.object as Stripe.Checkout.Session;
-      const orderId = session.metadata?.orderId;
-      
-      if (orderId) {
-        const order = await ctx.runQuery(api.orders.getOrder, {
-          orderId: orderId as any,
-        });
-        
-        if (order) {
-          // Release all items back to available
-          for (const itemId of order.itemIds) {
-            try {
-              await ctx.runMutation(api.items.releasePendingItem, {
-                itemId: itemId,
-              });
-            } catch (error) {
-              console.error(`Failed to release item ${itemId}:`, error);
-            }
-          }
-          
-          // Update order status
-          await ctx.runMutation(api.orders.updateOrderStatus, {
-            orderId: orderId as any,
-            status: "failed",
-          });
-        }
-      }
-      break;
-    }
-    
-    case "checkout.session.async_payment_succeeded": {
-      // Handle async payment success (for delayed payment methods)
-      const session = event.data.object as Stripe.Checkout.Session;
-      const orderId = session.metadata?.orderId;
-      
-      if (orderId) {
-        const order = await ctx.runQuery(api.orders.getOrder, {
-          orderId: orderId as any,
-        });
-        
-        if (order) {
-          // Mark items as sold
-          for (const itemId of order.itemIds) {
-            try {
-              await ctx.runMutation(api.items.markItemAsSold, {
-                itemId: itemId,
-              });
-            } catch (error) {
-              console.error(`Failed to mark item ${itemId} as sold:`, error);
-            }
-          }
-          
-          // Update order status
-          await ctx.runMutation(api.orders.updateOrderStatus, {
-            orderId: orderId as any,
-            status: "completed",
-          });
-        }
-      }
-      break;
-    }
-    
-    default:
-      console.log(`Unhandled event type: ${event.type}`);
-  }
-  
-  return new Response(JSON.stringify({ received: true }), {
-    status: 200,
-    headers: { "Content-Type": "application/json" },
-  });
 });

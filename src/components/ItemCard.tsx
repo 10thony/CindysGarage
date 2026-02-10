@@ -83,9 +83,9 @@ export function ItemCard({
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="absolute inset-0 bg-amber-500/40 backdrop-blur-sm flex items-center justify-center"
+                className="absolute inset-0 bg-primary/40 backdrop-blur-sm flex items-center justify-center"
               >
-                <Badge className="bg-amber-500 text-white font-bold text-base px-5 py-2.5 shadow-elegant-lg border-0">
+                <Badge className="bg-primary text-primary-foreground font-bold text-base px-5 py-2.5 shadow-elegant-lg border-0">
                   PENDING
                 </Badge>
               </motion.div>
