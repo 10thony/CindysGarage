@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useMutation } from "convex/react";
+import { useMutation, useConvexAuth } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -20,6 +20,7 @@ export function GarageForm({ onSuccess, onCancel }: GarageFormProps) {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
+  const { isLoading: isAuthLoading, isAuthenticated } = useConvexAuth();
 
   const createGarage = useMutation(api.garages.createGarage);
 
@@ -41,25 +42,44 @@ export function GarageForm({ onSuccess, onCancel }: GarageFormProps) {
       return;
     }
 
+    if (isAuthLoading) {
+      setErrors({ form: "Authentication is still loading. Please wait a moment and try again." });
+      return;
+    }
+
+    if (!isAuthenticated) {
+      setErrors({ form: "You must be signed in to create a garage. Please sign in and try again." });
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
-      const garageId = await createGarage({
-        name: name.trim(),
-        description: description.trim() || undefined,
-        isPublic,
-      });
+      const MUTATION_TIMEOUT_MS = 15_000;
+      const garageId = await Promise.race([
+        createGarage({
+          name: name.trim(),
+          description: description.trim() || undefined,
+          isPublic,
+        }),
+        new Promise<never>((_, reject) =>
+          setTimeout(
+            () => reject(new Error("Request timed out. Please check your connection and try again.")),
+            MUTATION_TIMEOUT_MS,
+          )
+        ),
+      ]);
 
       onSuccess();
       // Navigate to the new garage
       navigate({ to: `/garage/${garageId}` });
     } catch (error) {
       console.error("Failed to create garage:", error);
-      alert(
-        error instanceof Error
+      setErrors({
+        form: error instanceof Error
           ? error.message
-          : "Failed to create garage. Please try again."
-      );
+          : "Failed to create garage. Please try again.",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -96,6 +116,12 @@ export function GarageForm({ onSuccess, onCancel }: GarageFormProps) {
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-6">
+                {errors.form && (
+                  <div className="rounded-md bg-destructive/10 border border-destructive/20 p-3">
+                    <p className="text-sm text-destructive">{errors.form}</p>
+                  </div>
+                )}
+
                 {/* Garage Name */}
                 <div>
                   <label htmlFor="name" className="text-sm font-medium mb-2 block">

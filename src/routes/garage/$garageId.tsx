@@ -66,7 +66,7 @@ function GarageDetailPage() {
   // Loading state
   if (garage === undefined || allItems === undefined) {
     return (
-      <div className="min-h-screen gradient-bg p-4">
+      <div className="min-h-screen gradient-bg p-4" data-theme="garage">
         <div className="max-w-7xl mx-auto">
           <div className="animate-pulse space-y-4">
             <div className="h-12 bg-muted rounded-lg w-48"></div>
@@ -86,10 +86,10 @@ function GarageDetailPage() {
   // Not found state
   if (garage === null) {
     return (
-      <div className="min-h-screen gradient-bg flex items-center justify-center p-4">
+      <div className="min-h-screen gradient-bg flex items-center justify-center p-4" data-theme="garage">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">Garage not found</h1>
-          <p className="text-gray-600 mb-4">This garage may have been removed or is private.</p>
+          <h1 className="text-2xl font-bold text-foreground mb-2">Garage not found</h1>
+          <p className="text-muted-foreground mb-4">This garage may have been removed or is private.</p>
           <Button onClick={() => navigate({ to: "/" })}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Home
@@ -111,21 +111,21 @@ function GarageDetailPage() {
   const progress = totalValue > 0 ? (soldValue / totalValue) * 100 : 0
   
   return (
-    <div className="min-h-screen gradient-bg">
+    <div className="min-h-screen gradient-bg" data-theme="garage">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border/50">
+      <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border/50 shadow-elegant">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center gap-4">
             <Button
               variant="ghost"
               size="icon"
               onClick={() => navigate({ to: "/" })}
-              className="flex-shrink-0"
+              className="flex-shrink-0 text-foreground hover:text-primary hover:bg-primary/10"
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div className="flex-1 min-w-0">
-              <h1 className="text-2xl font-bold line-clamp-1">{garage.name}</h1>
+              <h1 className="text-2xl font-bold line-clamp-1 text-foreground">{garage.name}</h1>
               {garage.description && (
                 <p className="text-sm text-muted-foreground line-clamp-1 mt-1">
                   {garage.description}
@@ -134,7 +134,6 @@ function GarageDetailPage() {
             </div>
             {isOwner && (
               <Button
-                variant="outline"
                 onClick={() => {
                   // TODO: Implement edit garage functionality
                   console.log("Edit garage:", garageId)
@@ -156,7 +155,7 @@ function GarageDetailPage() {
               <div className="p-2 rounded-lg bg-primary/10">
                 <Store className="h-5 w-5 text-primary" />
               </div>
-              <h2 className="text-xl font-bold">Garage Statistics</h2>
+              <h2 className="text-xl font-bold text-foreground">Garage Statistics</h2>
             </div>
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
@@ -164,13 +163,13 @@ function GarageDetailPage() {
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
                   Total Items
                 </p>
-                <p className="text-2xl font-bold">{totalItems}</p>
+                <p className="text-2xl font-bold text-foreground">{totalItems}</p>
               </div>
               <div>
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
                   Available
                 </p>
-                <p className="text-2xl font-bold text-green-600">{availableItems}</p>
+                <p className="text-2xl font-bold text-accent">{availableItems}</p>
               </div>
               <div>
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
@@ -182,7 +181,7 @@ function GarageDetailPage() {
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
                   Pending
                 </p>
-                <p className="text-2xl font-bold text-amber-600">{pendingItems}</p>
+                <p className="text-2xl font-bold text-muted-foreground">{pendingItems}</p>
               </div>
             </div>
             
@@ -196,7 +195,7 @@ function GarageDetailPage() {
                   initial={{ width: 0 }}
                   animate={{ width: `${progress}%` }}
                   transition={{ duration: 0.8, ease: "easeOut" }}
-                  className="h-full bg-gradient-to-r from-primary to-accent rounded-full"
+                  className="h-full bg-gradient-to-r from-primary to-accent rounded-full shadow-sm"
                 />
               </div>
             </div>
@@ -245,7 +244,7 @@ function GarageDetailPage() {
           <Card className="card-gradient border-2 border-border/50 shadow-elegant">
             <CardContent className="p-12 text-center">
               <Store className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-xl font-bold mb-2">No items found</h3>
+              <h3 className="text-xl font-bold text-foreground mb-2">No items found</h3>
               <p className="text-muted-foreground">
                 {searchTerm || statusFilter !== "all"
                   ? "Try adjusting your filters"
@@ -256,10 +255,16 @@ function GarageDetailPage() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          <div
+            className="grid gap-6"
+            style={{
+              gridTemplateColumns: "repeat(auto-fill, minmax(min(240px, 100%), 1fr))",
+            }}
+          >
             {filteredItems.map((item) => (
               <ItemCard
                 key={item._id}
+                variant="grid"
                 itemId={item._id}
                 name={item.name}
                 imageUrl={item.imageUrl}

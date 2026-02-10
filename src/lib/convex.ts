@@ -12,4 +12,7 @@ if (!convexUrl) {
   )
 }
 
-export const convex = new ConvexReactClient(convexUrl)
+export const convex = new ConvexReactClient(convexUrl, {
+  // Disable Convex's default logger to avoid "WebSocket reconnected" console noise
+  logger: false,
+})

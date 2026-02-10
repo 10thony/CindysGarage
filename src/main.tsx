@@ -1,7 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { RouterProvider } from '@tanstack/react-router'
-import { ConvexProviderWithAuth } from 'convex/react'
+import { ConvexProviderWithClerk } from 'convex/react-clerk'
 import { ClerkProvider, useAuth } from '@clerk/clerk-react'
 import { convex } from './lib/convex'
 import { getRouter } from './router'
@@ -20,33 +20,6 @@ if (!clerkPublishableKey) {
   )
 }
 
-// Wrapper component to use Clerk's useAuth hook with Convex
-function ConvexProviderWithClerk({ children }: { children: React.ReactNode }) {
-  const auth = useAuth()
-  
-  return (
-    <ConvexProviderWithAuth
-      client={convex}
-      useAuth={() => ({
-        isLoading: !auth.isLoaded,
-        isAuthenticated: auth.isSignedIn ?? false,
-        fetchAccessToken: async () => {
-          // Check for token from environment variable first
-          const envToken = import.meta.env.VITE_CONVEX_AUTH_TOKEN
-          if (envToken) {
-            return envToken
-          }
-          // Fall back to getting token from Clerk
-          const token = await auth.getToken({ template: "convex" })
-          return token ?? null
-        },
-      })}
-    >
-      {children}
-    </ConvexProviderWithAuth>
-  )
-}
-
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ClerkProvider 
@@ -56,7 +29,7 @@ createRoot(document.getElementById('root')!).render(
       signUpUrl="/sign-up"
       signUpFallbackRedirectUrl="/"
     >
-      <ConvexProviderWithClerk>
+      <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
         <CartProvider>
           <RouterProvider router={router} />
           <CartFAB />

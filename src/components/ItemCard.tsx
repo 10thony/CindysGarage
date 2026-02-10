@@ -14,6 +14,8 @@ interface ItemCardProps {
   salePrice: number
   garageId: Id<"garages">
   status: "available" | "sold" | "pending"
+  /** Use "grid" when card is in a responsive grid (garage details); "shelf" for horizontal scroll (home). */
+  variant?: "shelf" | "grid"
 }
 
 export function ItemCard({
@@ -23,6 +25,7 @@ export function ItemCard({
   salePrice,
   garageId,
   status,
+  variant = "shelf",
 }: ItemCardProps) {
   const navigate = useNavigate()
   // Get garage name for display
@@ -35,8 +38,15 @@ export function ItemCard({
       onClick={() => {
         navigate({ to: `/item/${itemId}` })
       }}
+      className={variant === "grid" ? "w-full min-w-0" : undefined}
     >
-      <Card className="min-w-[240px] snap-start cursor-pointer card-gradient border-2 border-border/50 shadow-elegant hover:shadow-elegant-xl transition-all duration-300 overflow-hidden group">
+      <Card
+        className={
+          variant === "grid"
+            ? "w-full min-w-0 cursor-pointer card-gradient border-2 border-border/50 shadow-elegant hover:shadow-elegant-xl transition-all duration-300 overflow-hidden group"
+            : "min-w-[240px] snap-start cursor-pointer card-gradient border-2 border-border/50 shadow-elegant hover:shadow-elegant-xl transition-all duration-300 overflow-hidden group"
+        }
+      >
         <div className="relative overflow-hidden">
           {/* Image with elegant overlay on hover */}
           <div className="relative aspect-[4/5] overflow-hidden bg-muted">
