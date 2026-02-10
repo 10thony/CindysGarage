@@ -3,9 +3,10 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"bunx convex dev\" \"vite dev\"",
+    "dev": "concurrently \"bunx convex dev\" \"bun run dev:upload\" \"vite dev\"",
     "dev:vite": "vite dev",
     "dev:convex": "bunx convex dev",
+    "dev:upload": "bun run scripts/run-upload-server.ts",
     "build": "vite build",
     "start": "vite start",
     "typecheck": "tsc --noEmit"
@@ -24,6 +25,7 @@
     "lucide-react": "^0.562.0",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
+    "express": "^4.18.2",
     "stripe": "^14.0.0",
     "tailwind-merge": "^3.4.0",
     "uploadthing": "^7.0.0"
@@ -31,6 +33,7 @@
   "devDependencies": {
     "@netlify/vite-plugin-tanstack-start": "^1.2.6",
     "@tanstack/router-plugin": "^1.151.1",
+    "@types/express": "^4.17.21",
     "@types/node": "^20.0.0",
     "@types/react": "^18.3.0",
     "@types/react-dom": "^18.3.0",

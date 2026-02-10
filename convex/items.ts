@@ -322,3 +322,30 @@ export const markItemAsSold = mutation({
     return args.itemId;
   },
 });
+
+/**
+ * Mutation to release an item from pending status back to available
+ * Called when payment fails or cart is abandoned
+ */
+export const releasePendingItem = mutation({
+  args: {
+    itemId: v.id("items"),
+  },
+  handler: async (ctx, args) => {
+    const item = await ctx.db.get(args.itemId);
+    
+    if (!item) {
+      throw new Error("Item not found");
+    }
+    
+    if (item.status !== "pending") {
+      throw new Error(`Item is not pending. Current status: ${item.status}`);
+    }
+    
+    await ctx.db.patch(args.itemId, {
+      status: "available",
+    });
+    
+    return args.itemId;
+  },
+});

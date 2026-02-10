@@ -5,6 +5,7 @@ import { useQuery } from "convex/react"
 import { Id } from "../../convex/_generated/dataModel"
 import { motion } from "framer-motion"
 import { Store, Tag } from "lucide-react"
+import { useNavigate } from "@tanstack/react-router"
 
 interface ItemCardProps {
   itemId: Id<"items">
@@ -23,6 +24,7 @@ export function ItemCard({
   garageId,
   status,
 }: ItemCardProps) {
+  const navigate = useNavigate()
   // Get garage name for display
   const garage = useQuery(api.garages.getGarage, { garageId })
 
@@ -31,8 +33,7 @@ export function ItemCard({
       whileHover={{ y: -6 }}
       whileTap={{ scale: 0.97 }}
       onClick={() => {
-        // TODO: Navigate to /item/$itemId when route is created
-        console.log("Navigate to item:", itemId)
+        navigate({ to: `/item/${itemId}` })
       }}
     >
       <Card className="min-w-[240px] snap-start cursor-pointer card-gradient border-2 border-border/50 shadow-elegant hover:shadow-elegant-xl transition-all duration-300 overflow-hidden group">
@@ -101,8 +102,7 @@ export function ItemCard({
             <button
               onClick={(e) => {
                 e.stopPropagation()
-                // TODO: Navigate to /garage/$garageId when route is created
-                console.log("Navigate to garage:", garageId)
+                navigate({ to: `/garage/${garageId}` })
               }}
               className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-primary transition-colors group/garage"
             >

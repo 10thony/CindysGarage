@@ -39,12 +39,13 @@ export const getOrdersByItem = query({
 /**
  * Mutation to create an order record
  * Links items to order and sets initial status
+ * stripeSessionId is optional initially (will be set after Stripe session creation)
  */
 export const createOrder = mutation({
   args: {
     customerId: v.string(),
     itemIds: v.array(v.id("items")),
-    stripeSessionId: v.string(),
+    stripeSessionId: v.optional(v.string()),
     totalAmount: v.number(),
     status: v.string(),
   },
@@ -58,10 +59,6 @@ export const createOrder = mutation({
       throw new Error("Total amount must be greater than zero");
     }
     
-    if (!args.stripeSessionId || args.stripeSessionId.trim().length === 0) {
-      throw new Error("Stripe session ID is required");
-    }
-    
     // Verify all items exist
     for (const itemId of args.itemIds) {
       const item = await ctx.db.get(itemId);
@@ -73,12 +70,40 @@ export const createOrder = mutation({
     const orderId = await ctx.db.insert("orders", {
       customerId: args.customerId,
       itemIds: args.itemIds,
-      stripeSessionId: args.stripeSessionId.trim(),
+      stripeSessionId: args.stripeSessionId?.trim() || "",
       totalAmount: args.totalAmount,
       status: args.status,
     });
     
     return orderId;
+  },
+});
+
+/**
+ * Mutation to update order's Stripe session ID
+ * Called after Stripe checkout session is created
+ */
+export const updateOrderStripeSessionId = mutation({
+  args: {
+    orderId: v.id("orders"),
+    stripeSessionId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const order = await ctx.db.get(args.orderId);
+    
+    if (!order) {
+      throw new Error("Order not found");
+    }
+    
+    if (!args.stripeSessionId || args.stripeSessionId.trim().length === 0) {
+      throw new Error("Stripe session ID is required");
+    }
+    
+    await ctx.db.patch(args.orderId, {
+      stripeSessionId: args.stripeSessionId.trim(),
+    });
+    
+    return args.orderId;
   },
 });
 

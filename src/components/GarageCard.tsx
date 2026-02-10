@@ -5,6 +5,7 @@ import { useQuery } from "convex/react"
 import { Id } from "../../convex/_generated/dataModel"
 import { motion } from "framer-motion"
 import { Store, TrendingUp } from "lucide-react"
+import { useNavigate } from "@tanstack/react-router"
 
 interface GarageCardProps {
   garageId: Id<"garages">
@@ -13,6 +14,7 @@ interface GarageCardProps {
 }
 
 export function GarageCard({ garageId, name, description }: GarageCardProps) {
+  const navigate = useNavigate()
   // Get items for this garage to calculate progress
   const items = useQuery(api.items.getItemsByGarage, { garageId }) || []
   
@@ -29,8 +31,7 @@ export function GarageCard({ garageId, name, description }: GarageCardProps) {
       whileHover={{ y: -4 }}
       whileTap={{ scale: 0.98 }}
       onClick={() => {
-        // TODO: Navigate to /garage/$garageId when route is created
-        console.log("Navigate to garage:", garageId)
+        navigate({ to: `/garage/${garageId}` })
       }}
     >
       <Card className="min-w-[320px] snap-start cursor-pointer card-gradient border-2 border-border/50 shadow-elegant hover:shadow-elegant-lg transition-all duration-300 overflow-hidden group">

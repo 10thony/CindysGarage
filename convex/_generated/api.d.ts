@@ -11,6 +11,7 @@
 import type * as garages from "../garages.js";
 import type * as items from "../items.js";
 import type * as orders from "../orders.js";
+import type * as stripe from "../stripe.js";
 import type * as users from "../users.js";
 
 import type {
@@ -23,6 +24,7 @@ declare const fullApi: ApiFromModules<{
   garages: typeof garages;
   items: typeof items;
   orders: typeof orders;
+  stripe: typeof stripe;
   users: typeof users;
 }>;
 

@@ -1,17 +1,33 @@
 import { useState, useMemo } from "react"
 import { useQuery } from "convex/react"
 import { motion } from "framer-motion"
+import { useUser, useAuth } from "@clerk/clerk-react"
+import { useNavigate } from "@tanstack/react-router"
 import { Input } from "./ui/input"
+import { Button } from "./ui/button"
 import { GarageCard } from "./GarageCard"
 import { ItemCard } from "./ItemCard"
+import { GarageForm } from "./GarageForm"
 import { api } from "../../convex/_generated/api"
-import { Search, X, Sparkles } from "lucide-react"
+import { Search, X, Sparkles, LogIn, LogOut, Plus } from "lucide-react"
 
 export function DiscoveryDashboard() {
+  const { isSignedIn } = useUser()
+  const { signOut } = useAuth()
+  const navigate = useNavigate()
   const [garageSearchTerm, setGarageSearchTerm] = useState("")
   const [itemSearchTerm, setItemSearchTerm] = useState("")
   const [itemMinPrice, setItemMinPrice] = useState<number | undefined>()
   const [itemMaxPrice, setItemMaxPrice] = useState<number | undefined>()
+  const [showGarageForm, setShowGarageForm] = useState(false)
+
+  const handleAuthClick = async () => {
+    if (isSignedIn) {
+      await signOut()
+    } else {
+      navigate({ to: "/sign-in" })
+    }
+  }
 
   // Fetch garages with search (searchGarages handles empty searchTerm by returning all)
   const garages = useQuery(
@@ -55,22 +71,41 @@ export function DiscoveryDashboard() {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="flex items-center gap-3"
+            className="flex items-center justify-between gap-3"
           >
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20 blur-xl rounded-full"></div>
-              <div className="relative bg-gradient-to-br from-primary to-accent p-3 rounded-2xl shadow-elegant-lg">
-                <Sparkles className="h-6 w-6 text-primary-foreground" />
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20 blur-xl rounded-full"></div>
+                <div className="relative bg-gradient-to-br from-primary to-accent p-3 rounded-2xl shadow-elegant-lg">
+                  <Sparkles className="h-6 w-6 text-primary-foreground" />
+                </div>
+              </div>
+              <div>
+                <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
+                  Cindy's Garage
+                </h1>
+                <p className="text-xs sm:text-sm text-muted-foreground font-medium">
+                  Discover hidden treasures
+                </p>
               </div>
             </div>
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
-                Cindy's Garage
-              </h1>
-              <p className="text-xs sm:text-sm text-muted-foreground font-medium">
-                Discover hidden treasures
-              </p>
-            </div>
+            <Button
+              onClick={handleAuthClick}
+              variant="outline"
+              className="flex items-center gap-2"
+            >
+              {isSignedIn ? (
+                <>
+                  <LogOut className="h-4 w-4" />
+                  <span className="hidden sm:inline">Sign Out</span>
+                </>
+              ) : (
+                <>
+                  <LogIn className="h-4 w-4" />
+                  <span className="hidden sm:inline">Sign In</span>
+                </>
+              )}
+            </Button>
           </motion.div>
         </div>
       </header>
@@ -115,6 +150,16 @@ export function DiscoveryDashboard() {
           <div className="flex items-center gap-3 mb-6 px-1">
             <div className="h-1 w-8 bg-gradient-to-r from-primary to-accent rounded-full"></div>
             <h2 className="text-2xl font-bold text-foreground">Featured Garages</h2>
+            {isSignedIn && (
+              <Button
+                onClick={() => setShowGarageForm(true)}
+                size="sm"
+                className="ml-auto flex items-center gap-2"
+              >
+                <Plus className="h-4 w-4" />
+                Create Garage
+              </Button>
+            )}
           </div>
           {garages === undefined ? (
             <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide">
@@ -294,6 +339,16 @@ export function DiscoveryDashboard() {
           )}
         </motion.section>
       </div>
+
+      {/* Garage Form Modal */}
+      {showGarageForm && (
+        <GarageForm
+          onSuccess={() => {
+            setShowGarageForm(false)
+          }}
+          onCancel={() => setShowGarageForm(false)}
+        />
+      )}
     </div>
   )
 }
