@@ -38,6 +38,7 @@
   "devDependencies": {
     "@edge-runtime/vm": "^5.0.0",
     "@netlify/vite-plugin-tanstack-start": "^1.2.6",
+    "@rollup/rollup-linux-x64-gnu": "^4.57.1",
     "@tanstack/router-plugin": "^1.151.1",
     "@types/express": "^4.17.21",
     "@types/node": "^20.0.0",
