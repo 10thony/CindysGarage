@@ -33,10 +33,11 @@ function PaymentSuccessPage() {
     }
   }, [sessionId, clearCart])
 
-  // Fetch recent orders for the user
-  const orders = user ? useQuery(api.orders.getOrdersByCustomer, {
-    customerId: user.id,
-  }) : null
+  // Fetch recent orders for the user (call useQuery unconditionally to satisfy Rules of Hooks)
+  const orders = useQuery(
+    api.orders.getOrdersByCustomer,
+    user ? { customerId: user.id } : "skip"
+  )
 
   // Get the most recent order (assuming it's the one just completed)
   const recentOrder = orders && orders.length > 0 

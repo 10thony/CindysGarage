@@ -31,10 +31,11 @@ function ItemDetailPage() {
     itemId: itemId as Id<"items">
   })
   
-  // Fetch garage data for this item
-  const garage = item ? useQuery(api.garages.getGarage, { 
-    garageId: item.garageId
-  }) : null
+  // Fetch garage data for this item (call useQuery unconditionally to satisfy Rules of Hooks)
+  const garage = useQuery(
+    api.garages.getGarage,
+    item ? { garageId: item.garageId } : "skip"
+  )
   
   // Check if current user is the owner
   const isOwner = item && isSignedIn && user && item.ownerId === user.id
@@ -43,7 +44,7 @@ function ItemDetailPage() {
   // Loading state
   if (item === undefined || (item && garage === undefined)) {
     return (
-      <div className="min-h-screen gradient-bg p-4">
+      <div className="min-h-screen gradient-bg p-4" data-theme="garage">
         <div className="max-w-4xl mx-auto">
           <div className="animate-pulse space-y-4">
             <div className="h-12 bg-muted rounded-lg w-48"></div>
@@ -64,10 +65,10 @@ function ItemDetailPage() {
   // Not found state
   if (item === null) {
     return (
-      <div className="min-h-screen gradient-bg flex items-center justify-center p-4">
+      <div className="min-h-screen gradient-bg flex items-center justify-center p-4" data-theme="garage">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">Item not found</h1>
-          <p className="text-gray-600 mb-4">This item may have been removed or is no longer available.</p>
+          <h1 className="text-2xl font-bold text-foreground mb-2">Item not found</h1>
+          <p className="text-muted-foreground mb-4">This item may have been removed or is no longer available.</p>
           <Button onClick={() => navigate({ to: "/" })}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Home
@@ -107,26 +108,25 @@ function ItemDetailPage() {
   }
   
   return (
-    <div className="min-h-screen gradient-bg">
+    <div className="min-h-screen gradient-bg" data-theme="garage">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border/50">
+      <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border/50 shadow-elegant">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center gap-4">
             <Button
               variant="ghost"
               size="icon"
               onClick={() => navigate({ to: "/" })}
-              className="flex-shrink-0"
+              className="flex-shrink-0 text-foreground hover:text-primary hover:bg-primary/10"
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div className="flex-1 min-w-0">
-              <h1 className="text-xl font-bold line-clamp-1">{item.name}</h1>
+              <h1 className="text-xl font-bold line-clamp-1 text-foreground">{item.name}</h1>
             </div>
             {isOwner && (
               <div className="flex gap-2">
                 <Button
-                  variant="outline"
                   size="sm"
                   onClick={() => setShowEditForm(true)}
                 >
@@ -134,8 +134,8 @@ function ItemDetailPage() {
                   Edit
                 </Button>
                 <Button
-                  variant="outline"
                   size="sm"
+                  variant="destructive"
                   onClick={async () => {
                     if (confirm("Are you sure you want to delete this item? This action cannot be undone.")) {
                       try {
@@ -171,8 +171,8 @@ function ItemDetailPage() {
                   </div>
                 )}
                 {item.status === "pending" && (
-                  <div className="absolute inset-0 bg-amber-500/40 backdrop-blur-sm flex items-center justify-center z-10">
-                    <Badge className="bg-amber-500 text-white font-bold text-lg px-6 py-3 shadow-elegant-lg border-0">
+                  <div className="absolute inset-0 bg-primary/40 backdrop-blur-sm flex items-center justify-center z-10">
+                    <Badge className="bg-primary text-primary-foreground font-bold text-lg px-6 py-3 shadow-elegant-lg border-0">
                       PENDING
                     </Badge>
                   </div>
@@ -302,7 +302,6 @@ function ItemDetailPage() {
             {isOwner && (
               <div className="space-y-2">
                 <Button
-                  variant="outline"
                   className="w-full"
                   onClick={() => {
                     // TODO: Implement edit item functionality
@@ -330,19 +329,19 @@ function ItemDetailPage() {
             {/* Item Info */}
             <Card className="card-gradient border-2 border-border/50 shadow-elegant">
               <CardContent className="p-6">
-                <h3 className="text-lg font-bold mb-4">Item Information</h3>
+                <h3 className="text-lg font-bold text-foreground mb-4">Item Information</h3>
                 <div className="space-y-3">
                   <div>
                     <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-1">
                       Item Name
                     </p>
-                    <p className="text-base font-semibold">{item.name}</p>
+                    <p className="text-base font-semibold text-foreground">{item.name}</p>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-1">
                       Original Price
                     </p>
-                    <p className="text-base font-semibold">${item.initialPrice.toFixed(2)}</p>
+                    <p className="text-base font-semibold text-foreground">${item.initialPrice.toFixed(2)}</p>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-1">

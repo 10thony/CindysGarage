@@ -228,10 +228,7 @@ function GarageDetailPage() {
           </div>
           {isOwner && (
             <Button
-              onClick={() => {
-                // TODO: Implement add item functionality
-                console.log("Add item to garage:", garageId)
-              }}
+              onClick={() => setShowItemForm(true)}
             >
               <Plus className="h-4 w-4 mr-2" />
               Add Item
@@ -245,13 +242,19 @@ function GarageDetailPage() {
             <CardContent className="p-12 text-center">
               <Store className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
               <h3 className="text-xl font-bold text-foreground mb-2">No items found</h3>
-              <p className="text-muted-foreground">
+              <p className="text-muted-foreground mb-4">
                 {searchTerm || statusFilter !== "all"
                   ? "Try adjusting your filters"
                   : isOwner
                   ? "Start by adding your first item"
                   : "This garage doesn't have any items yet"}
               </p>
+              {isOwner && !searchTerm && statusFilter === "all" && (
+                <Button onClick={() => setShowItemForm(true)}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add your first item
+                </Button>
+              )}
             </CardContent>
           </Card>
         ) : (
